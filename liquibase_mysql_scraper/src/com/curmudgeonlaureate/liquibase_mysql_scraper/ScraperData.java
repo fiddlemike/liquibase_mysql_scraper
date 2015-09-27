@@ -10,9 +10,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
@@ -65,9 +66,10 @@ public class ScraperData {
 		            fetchView.put(viewName, viewContents);
 		        }
 				
-			} catch (SQLException e) {
+			} catch (SQLException ex) {
+				 Logger.getLogger(ScraperData .class.getName()).log(Level.SEVERE, null, ex);
 				System.out.println("method setViews");
-				e.printStackTrace();
+				ex.printStackTrace();
 			}finally {
 		        if (preparedStatement != null) { preparedStatement.close(); }
 		    }
@@ -174,7 +176,7 @@ public class ScraperData {
 			}finally {
 		        if (preparedStatement != null) { preparedStatement.close(); }
 		    }
-		    System.out.println("Number of Functions fetched: " + fetchTriggers.size());
+		    System.out.println("Number of Triggers fetched: " + fetchTriggers.size());
 		    this.triggers = fetchTriggers;
 		}
 

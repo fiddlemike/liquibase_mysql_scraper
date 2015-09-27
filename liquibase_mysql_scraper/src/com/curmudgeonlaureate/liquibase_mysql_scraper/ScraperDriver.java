@@ -110,7 +110,7 @@ public class ScraperDriver {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        
+         ScraperWriter.writeViewsXMLFiles(dbData); 
          
          
 	 } //end method main()

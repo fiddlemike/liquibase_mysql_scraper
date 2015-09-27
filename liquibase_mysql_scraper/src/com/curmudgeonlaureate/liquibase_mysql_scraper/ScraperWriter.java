@@ -8,6 +8,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Description of ScraperWriter
 * The purpose for this class is write the data fetched from the 
@@ -18,9 +25,76 @@ import java.sql.Statement;
 * @version .1 August 30, 2015
 */
 public class ScraperWriter {
+	
 
+	/* 
+	 * Here we use the hashMap from the ScraperData class that 
+	 * holds the key, value pairs for the views extracted from the database
+	 * to write the liquibase compliant create view xml files.
+	 * 
+	 * example:
+	 * 
+	 *		<changeSet author="liquibase-mysql_scraper" id="createView-example">
+	 *		    <createView catalogName="cat"
+	 *		            replaceIfExists="true"
+	 *			            schemaName="public"
+	 *			            viewName="v_person">select id, name from person where id > 10</createView>
+	 *			</changeSet>
+	 *
+	 */
+	public static void writeViewsXMLFiles(ScraperData dbData){
+		/* 
+		 * We iterate through the hashMap and write the xml files
+		 * We will also add the file names to a list so that we can write 
+		 * the view's master changelog file
+		 */
+		List<String> fileList = new ArrayList<String>();
+		String directory = "liquibase_files/views";
+		String viewChangeLog = "views.masterChangelog.xml";
+		Iterator<Entry<String, String>> entries =   dbData.getViews().entrySet().iterator();
+		while (entries.hasNext()) {
+		    Map.Entry<String, String> entry = entries.next();
+		    String key = (String)entry.getKey();
+		    String value = (String)entry.getValue();
+		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" + "<changeSet author='liquibase-mysql_scraper' id='createView-"
+		    		+ key + "'>" + "\r\n" + "<createView catalogName='test'" + "\r\n"
+		    		+ " replaceIfExists='true'" + "\r\n" 
+		    		+  "schemaName='public'" + "\r\n" 
+		    		+ "viewName='" + key + "'>"
+		    		+ "\r\n" + value +  "\r\n" 
+		    		+ "</createView>" +"\r\n" 
+		    		+"</changeSet>" 
+		    		+ ScraperUtils.changeLogFooter;
+		    String fileName = key + ".xml";
+		    writeFilesToDirectory(directory, fileName, fileContents);
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    fileList.add(includeFileName);
+		}
+		/* Here we write the view's master changelog file*/
+		String changeLogIncludes = ScraperUtils.concatStringsWSep(fileList, "");
+		String changeLogContents = ScraperUtils.changeLogHeader + changeLogIncludes + ScraperUtils.changeLogFooter;
+		writeFilesToDirectory(directory, viewChangeLog, changeLogContents);
+	}
 	
-	
+	public static void writeFilesToDirectory(String directory, String fileName, String fileContents){
+
+	    FileWriter fileWriter = null;
+        try {
+        	String filePathAndName = directory + '/' + fileName;
+            File newXMLFile = new File(filePathAndName);
+            fileWriter = new FileWriter(newXMLFile);
+            fileWriter.write(fileContents);
+            fileWriter.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ScraperWriter .class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fileWriter.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ScraperWriter .class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+	}
 	
 	public static void writeTable(String table, DBConnection myConn){
         try{

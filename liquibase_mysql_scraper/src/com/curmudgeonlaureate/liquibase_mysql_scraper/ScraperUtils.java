@@ -1,5 +1,4 @@
 package com.curmudgeonlaureate.liquibase_mysql_scraper;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 /** Description of Scraper_utils
 * The purpose for this class is hold utility methods 
@@ -11,10 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ScraperUtils {
 	  /**
@@ -26,20 +23,28 @@ public class ScraperUtils {
 	    throw new AssertionError();
 	  }
 
-	public static final String changeLogHeader = "<databaseChangeLog \n xmlns='http://www.liquibase.org/xml/ns/dbchangelog/1.7' \n xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n xsi:schemaLocation='http://www.liquibase.org/xml/ns/dbchangelog/1.7 \n http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.7.xsd'>";
-	public static final String changeLogFooter = "</databaseChangeLog>";
-	public static final String masterChangeLogInclude = "<include file='liquibase_files/";
+	public static final String changeLogHeader =  "<databaseChangeLog" + "\r\n"
+			+ "xmlns='http://www.liquibase.org/xml/ns/dbchangelog'" + "\r\n"
+			+ "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" + "\r\n" 
+			+ "xmlns:ext='http://www.liquibase.org/xml/ns/dbchangelog-ext'" +  "\r\n"
+			+ "xsi:schemaLocation='http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd'>";
+	public static final String changeLogFooter = "\r\n</databaseChangeLog>";
+	public static final String masterChangeLogIncludeBegin = "<include file='";
+	public static final String masterChangeLogIncludeEnd = "'/>";
 	public static final String fetchViews = "SELECT TABLE_NAME, VIEW_DEFINITION FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA = ?";
 	public static final String fetchStoredProcedures = "SELECT SPECIFIC_NAME,ROUTINE_DEFINITION FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA = ?";
 	public static final String fetchEvents = "SELECT EVENT_NAME,EVENT_DEFINITION FROM INFORMATION_SCHEMA.EVENTS WHERE EVENT_SCHEMA = ?";
 	public static final String fetchFuntions = "SELECT SPECIFIC_NAME,ROUTINE_DEFINITION FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'Function' AND ROUTINE_SCHEMA = ?"; 
 	public static final String fetchTables = "SELECT  TABLE_NAME  FROM information_schema.tables WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = ? AND table_name NOT LIKE '%cxm_entity_instance%' AND table_name NOT LIKE '%databasechangelog%';";
 	public static final String fetchTriggers = "SELECT trigger_name, action_statement FROM information_schema.triggers WHERE trigger_schema = ?";
+	public static final String scraperMasterChangeLogIncludes = "\r\n<include file='stored_procedures/storedProcedures.masterChangelog.xml'/>"
+			+ "\r\n<include file='views/views.masterChangelog.xml'/> \r\n<include file='functions/functions.masterChangelog.xml'/>"
+			+ " \r\n<include file='triggers/triggers.masterChangelog.xml'/>  \r\n<include file='events/events.masterChangelog.xml'/> ";
 	
 	static final String[] directoriesToCreate = { "stored_procedures","views","events","triggers","functions","tables" };
 
 	 public static void createDirectoryStructure () {
-		 
+		 /* First write the defined directory structure */
 		 for (String element : directoriesToCreate) {
 			    String scraperDirectories = "liquibase_files/" + element;
 				File files = new File(scraperDirectories);			
@@ -50,8 +55,26 @@ public class ScraperUtils {
 			            System.out.println("failed to create sub directories for " + element);
 			        }
 			    } // end !files.exists()
-
-			} // end for loop
+		} // end for loop
+		 /* Second write the defined Master Changelog for the database */
+		String scraperMasterChangelog = ScraperUtils.changeLogHeader 
+				+ ScraperUtils.scraperMasterChangeLogIncludes 
+				+ ScraperUtils.changeLogFooter ;
+		FileWriter fileWriter = null;
+        try {
+            File newXMLFile = new File("liquibase_files/scraper.masterChangelog.xml");
+            fileWriter = new FileWriter(newXMLFile);
+            fileWriter.write(scraperMasterChangelog);
+            fileWriter.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ScraperUtils.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fileWriter.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ScraperUtils.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 			
 	 } //end method createDirectoryStructure
 
@@ -114,4 +137,17 @@ public class ScraperUtils {
 	        return bytesOut;
 	    }
 	
+	    /*
+	     * Concatenate the strings in a list into a string
+	     * 
+	     */
+	    public static String concatStringsWSep(Iterable<String> strings, String separator) {
+	        StringBuilder sb = new StringBuilder();
+	        String sep = "";
+	        for(String s: strings) {
+	            sb.append(sep).append(s);
+	            sep = separator;
+	        }
+	        return sb.toString();                           
+	    }
 }// end class Scraper_utils 
