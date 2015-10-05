@@ -34,12 +34,15 @@ public class ScraperUtils {
 	public static final String fetchViews = "SELECT TABLE_NAME, VIEW_DEFINITION FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA = ?";
 	public static final String fetchStoredProcedures = "SELECT SPECIFIC_NAME,ROUTINE_DEFINITION FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA = ?";
 	public static final String fetchEvents = "SELECT EVENT_NAME,EVENT_DEFINITION FROM INFORMATION_SCHEMA.EVENTS WHERE EVENT_SCHEMA = ?";
-	public static final String fetchFuntions = "SELECT SPECIFIC_NAME,ROUTINE_DEFINITION FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'Function' AND ROUTINE_SCHEMA = ?"; 
+	public static final String fetchFunctionNames = "SELECT SPECIFIC_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'Function' AND ROUTINE_SCHEMA = ?"; 
+	public static final String fetchFunctionContents = "SHOW CREATE FUNCTION ?.?";
 	public static final String fetchTables = "SELECT  TABLE_NAME  FROM information_schema.tables WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = ? AND table_name NOT LIKE '%cxm_entity_instance%' AND table_name NOT LIKE '%databasechangelog%';";
 	public static final String fetchTriggers = "SELECT trigger_name, action_statement FROM information_schema.triggers WHERE trigger_schema = ?";
 	public static final String scraperMasterChangeLogIncludes = "\r\n<include file='stored_procedures/storedProcedures.masterChangelog.xml'/>"
 			+ "\r\n<include file='views/views.masterChangelog.xml'/> \r\n<include file='functions/functions.masterChangelog.xml'/>"
 			+ " \r\n<include file='triggers/triggers.masterChangelog.xml'/>  \r\n<include file='events/events.masterChangelog.xml'/> ";
+	public static final String commentOpenTag = "<comment>";
+	public static final String commentCloseTag = "</comment>";
 	
 	static final String[] directoriesToCreate = { "stored_procedures","views","events","triggers","functions","tables" };
 

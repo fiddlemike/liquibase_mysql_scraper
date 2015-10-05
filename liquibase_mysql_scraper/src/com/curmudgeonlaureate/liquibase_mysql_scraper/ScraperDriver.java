@@ -111,6 +111,8 @@ public class ScraperDriver {
 			e.printStackTrace();
 		}
          ScraperWriter.writeViewsXMLFiles(dbData); 
+         ScraperWriter.writeProceduresXMLFiles(dbData); 
+         ScraperWriter.writeFunctionsXMLFiles(dbData); 
          
          
 	 } //end method main()

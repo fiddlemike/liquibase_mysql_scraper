@@ -10,15 +10,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-
 public class ScraperData {
-
+		
+		private String dbName;
 		private HashMap<String,String> views;
 		private HashMap<String,String> storedProcedures;
 		private HashMap<String,String> events;
@@ -27,7 +31,9 @@ public class ScraperData {
 		private LinkedList<String> tables;
 		
 		private PreparedStatement preparedStatement = null;
+		private Statement stmt = null;
 		private ResultSet resultSet = null;
+	
 
 		
 		public ScraperData() {
@@ -38,10 +44,12 @@ public class ScraperData {
 			this.functions = null;
 			this.triggers = null;
 			this.tables = null;
+			this.dbName = null;
 		}
 
 		/* Set all data collectors in one function */
 		public void setAll(Connection connection, String dbName) throws SQLException{
+			setDbName(dbName);
 			setViews(connection, dbName);
 			setStoredProcedures(connection, dbName);
 			setEvents(connection, dbName);
@@ -50,6 +58,14 @@ public class ScraperData {
 			setTriggers(connection, dbName);
 		}
 		
+		public String getDbName() {
+			return dbName;
+		}
+
+		public void setDbName(String dbName) {
+			this.dbName = dbName;
+		}
+
 		public HashMap<String, String> getViews() {
 			return views;
 		}
@@ -110,7 +126,7 @@ public class ScraperData {
 		public void setEvents(Connection connection, String dbName) throws SQLException {
 			HashMap<String,String> fetchEvents = new HashMap<String,String>();
 		    try {
-				preparedStatement = connection.prepareStatement(ScraperUtils.fetchStoredProcedures);
+				preparedStatement = connection.prepareStatement(ScraperUtils.fetchEvents);
 				preparedStatement.setString(1, dbName);
 				resultSet = preparedStatement.executeQuery();
 				while (resultSet.next()) {
@@ -135,16 +151,28 @@ public class ScraperData {
 		}
 
 		public void setFunctions(Connection connection, String dbName) throws SQLException {
+			List<String> functionList = new ArrayList<String>();
 			HashMap<String,String> fetchFunctions = new HashMap<String,String>();
 		    try {
-				preparedStatement = connection.prepareStatement(ScraperUtils.fetchFuntions);
+				preparedStatement = connection.prepareStatement(ScraperUtils.fetchFunctionNames);
 				preparedStatement.setString(1, dbName);
 				resultSet = preparedStatement.executeQuery();
+				/* First we fetch the names of the functions in the database */
 				while (resultSet.next()) {
-		            String eventName = (resultSet.getString("SPECIFIC_NAME"));
-		            String eventContents = (resultSet.getString("ROUTINE_DEFINITION"));
-		            fetchFunctions.put(eventName, eventContents);       
+		            String functionName = (resultSet.getString("SPECIFIC_NAME"));
+		            functionList.add(functionName);
 		        }
+				/* Second we iterate over the list and grab the create code for the function */
+				for (String temp : functionList){
+					String query =  "SHOW CREATE FUNCTION " + dbName + "." + temp;
+					stmt = connection.createStatement();
+			        ResultSet rs = stmt.executeQuery(query);    
+			        while (rs.next()) {
+						String functionContents = (rs.getString("Create Function"));
+				        fetchFunctions.put(temp, functionContents);    
+			        }
+				}
+				 
 			} catch (SQLException e) {
 				System.out.println("method setFunctions");
 				e.printStackTrace();

@@ -26,6 +26,66 @@ import java.util.logging.Logger;
 */
 public class ScraperWriter {
 	
+	
+	public static void writeProceduresXMLFiles(ScraperData dbData){
+		/* 
+		 * We iterate through the hashMap and write the xml files
+		 * We will also add the file names to a list so that we can write 
+		 * the procedures's master changelog file
+		 */
+		List<String> fileList = new ArrayList<String>();
+		String directory = "liquibase_files/stored_procedures";
+		String procedureChangeLog = "storedProcedures.masterChangelog.xml";
+		String dbName = dbData.getDbName();
+		Iterator<Entry<String, String>> entries =   dbData.getStoredProcedures().entrySet().iterator();
+		while (entries.hasNext()) {
+		    Map.Entry<String, String> entry = entries.next();
+		    String key = (String)entry.getKey();
+		    String value = (String)entry.getValue();
+		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
+		    		/* First ChangeSet drops the stored procedure */
+		    		+ "<changeSet "
+		    		+ "author='liquibase-mysql_scraper' " + "\t"  
+		    		+ "id='dropProcedureIfExists-" + key + "'\t"  
+		    		+ "runOnChange='true'"  + ">"      	+ "\r\n" 
+		    		+ ScraperUtils.commentOpenTag + "\r\n" 
+		    		+ "Drop the stored procedure " + key +" so that a new version can be added to the base system for database "  + dbName + "\r\n"
+		    		+ ScraperUtils.commentCloseTag + "\r\n"
+		    		+ "<dropProcedure" + "\t"
+		    		+ "procedureName='" + key + "'\t" 	
+		    		+  "schemaName='" + dbName  + "'>\r\n" 
+		    		+ "</dropProcedure>" +"\r\n" 
+		    		+"</changeSet>" +"\r\n" 
+		    		
+		    		/*Second ChangeSet creates the stored procedure*/
+		    		+ "<changeSet "
+		    		+ "author='liquibase-mysql_scraper' " + "\t"  
+		    		+ "id='createProcedure-" + key + "'\t"  
+		    		+ "runOnChange='true'"  + ">"      	+ "\r\n" 
+		    		+ ScraperUtils.commentOpenTag + "\r\n" 
+		    		+ "Adding stored procedure " + key +"  to the base system for database "  + dbName + "\r\n"
+		    		+ ScraperUtils.commentCloseTag + "\r\n"
+		    		+ "<createProcedure" + "\t"
+		    		+ "dbms='mysql'" +"\t" 
+		    		+ "encoding='utf8'" +"\t" 
+		    		+ "procedureName='" + key + "'\t" 	
+		    		+  "schemaName='" + dbName  + "'>" 
+		    		+ "\r\n" + value +  "\r\n" 
+		    		+ "</createProcedure>" +"\r\n" 
+		    		+"</changeSet>" 
+		    		+ ScraperUtils.changeLogFooter;
+		    
+		    
+		    String fileName = key + ".xml";
+		    writeFilesToDirectory(directory, fileName, fileContents);
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    fileList.add(includeFileName);
+		}
+		/* Here we write the procedures's master changelog file*/
+		String changeLogIncludes = ScraperUtils.concatStringsWSep(fileList, "");
+		String changeLogContents = ScraperUtils.changeLogHeader + changeLogIncludes + ScraperUtils.changeLogFooter;
+		writeFilesToDirectory(directory, procedureChangeLog, changeLogContents);
+	} // END writeProceduresXMLFiles(ScraperData dbData)
 
 	/* 
 	 * Here we use the hashMap from the ScraperData class that 
@@ -35,10 +95,12 @@ public class ScraperWriter {
 	 * example:
 	 * 
 	 *		<changeSet author="liquibase-mysql_scraper" id="createView-example">
-	 *		    <createView catalogName="cat"
+	 *		<comment></comment>
+	 *		    <createView 
 	 *		            replaceIfExists="true"
-	 *			            schemaName="public"
-	 *			            viewName="v_person">select id, name from person where id > 10</createView>
+	 *					runOnChange="true"
+	 *			         schemaName="dbName"
+	 *			          viewName="v_person">select id, name from person where id > 10</createView>
 	 *			</changeSet>
 	 *
 	 */
@@ -51,15 +113,22 @@ public class ScraperWriter {
 		List<String> fileList = new ArrayList<String>();
 		String directory = "liquibase_files/views";
 		String viewChangeLog = "views.masterChangelog.xml";
+		String dbName = dbData.getDbName();
 		Iterator<Entry<String, String>> entries =   dbData.getViews().entrySet().iterator();
 		while (entries.hasNext()) {
 		    Map.Entry<String, String> entry = entries.next();
 		    String key = (String)entry.getKey();
 		    String value = (String)entry.getValue();
-		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" + "<changeSet author='liquibase-mysql_scraper' id='createView-"
-		    		+ key + "'>" + "\r\n" + "<createView catalogName='test'" + "\r\n"
-		    		+ " replaceIfExists='true'" + "\r\n" 
-		    		+  "schemaName='public'" + "\r\n" 
+		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
+		    		+ "<changeSet author='liquibase-mysql_scraper' id='createView-"
+		    		+ key  + "'\t"  
+		    		+ "runOnChange='true'>" + "\r\n" 
+		    		+ ScraperUtils.commentOpenTag + "\r\n" 
+		    		+ "adding view " + key + " to base system for database "  + dbName + "\r\n"
+		    		+ ScraperUtils.commentCloseTag + "\r\n"
+		    		+ "<createView" + "\t"
+		    		+ "replaceIfExists='true'" + "\t" 
+		    		+  "schemaName='" + dbName  + "'\t" 
 		    		+ "viewName='" + key + "'>"
 		    		+ "\r\n" + value +  "\r\n" 
 		    		+ "</createView>" +"\r\n" 
@@ -74,7 +143,47 @@ public class ScraperWriter {
 		String changeLogIncludes = ScraperUtils.concatStringsWSep(fileList, "");
 		String changeLogContents = ScraperUtils.changeLogHeader + changeLogIncludes + ScraperUtils.changeLogFooter;
 		writeFilesToDirectory(directory, viewChangeLog, changeLogContents);
-	}
+	} // END writeViewsXMLFiles(ScraperData dbData)
+	
+	public static void writeFunctionsXMLFiles(ScraperData dbData){
+		/* 
+		 * We iterate through the hashMap and write the xml files
+		 * We will also add the file names to a list so that we can write 
+		 * the functions' master changelog file
+		 */
+		List<String> fileList = new ArrayList<String>();
+		String directory = "liquibase_files/functions";
+		String functionChangeLog = "functions.masterChangelog.xml";
+		String dbName = dbData.getDbName();
+		Iterator<Entry<String, String>> entries =   dbData.getFunctions().entrySet().iterator();
+		while (entries.hasNext()) {
+		    Map.Entry<String, String> entry = entries.next();
+		    String key = (String)entry.getKey();
+		    String value = (String)entry.getValue();
+		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
+		    		+ "<changeSet author='liquibase-mysql_scraper' id='createFunction-"
+		    		+ key + "'" + "\t"  
+		    		+ "runOnChange='true'>" + "\r\n" 
+		    		+ ScraperUtils.commentOpenTag + "\r\n" 
+		    		+ "Adding the stored function " + key + " to base system for database "  + dbName + "\r\n"
+		    		+ ScraperUtils.commentCloseTag + "\r\n"
+		    		+ "<sql dbms='mysql' endDelimiter='#' splitStatements='true'>" + "'\r\n" 
+		    		+ "DROP FUNCTION IF EXISTS " + key + ";\r\n" + "#" + "\r\n"
+		    		+ value +  "\r\n" + "#" + "\r\n"
+		    		+ "</sql>" +"\r\n" 
+		    		+"</changeSet>" 
+		    		+ ScraperUtils.changeLogFooter;
+		    String fileName = key + ".xml";
+		    writeFilesToDirectory(directory, fileName, fileContents);
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    fileList.add(includeFileName);
+		}
+		/* Here we write the view's master changelog file*/
+		String changeLogIncludes = ScraperUtils.concatStringsWSep(fileList, "");
+		String changeLogContents = ScraperUtils.changeLogHeader + changeLogIncludes + ScraperUtils.changeLogFooter;
+		writeFilesToDirectory(directory, functionChangeLog, changeLogContents);
+	} // END writeFunctionsXMLFiles(ScraperData dbData)
+	
 	
 	public static void writeFilesToDirectory(String directory, String fileName, String fileContents){
 
