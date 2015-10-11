@@ -83,9 +83,8 @@ public class ScraperData {
 		        }
 				
 			} catch (SQLException ex) {
-				 Logger.getLogger(ScraperData .class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(ScraperData .class.getName()).log(Level.SEVERE, null, ex);
 				System.out.println("method setViews");
-				ex.printStackTrace();
 			}finally {
 		        if (preparedStatement != null) { preparedStatement.close(); }
 		    }
@@ -98,20 +97,32 @@ public class ScraperData {
 		}
 
 		public void setStoredProcedures(Connection connection, String dbName) throws SQLException {
+				List<String> procedureList = new ArrayList<String>();
 				HashMap<String,String> fetchStoredProcedures = new HashMap<String,String>();
 			    try {
-					preparedStatement = connection.prepareStatement(ScraperUtils.fetchStoredProcedures);
+					preparedStatement = connection.prepareStatement(ScraperUtils.fetchStoredProcedureNames);
 					preparedStatement.setString(1, dbName);
 					resultSet = preparedStatement.executeQuery();
+					/* First we fetch the names of the stored procedures in the database */
 					while (resultSet.next()) {
 			            String storedProcedureName = (resultSet.getString("SPECIFIC_NAME"));
-			            String storedProcedureContents = (resultSet.getString("ROUTINE_DEFINITION"));
-			            fetchStoredProcedures.put(storedProcedureName, storedProcedureContents);
+			            procedureList.add(storedProcedureName);
+			            //fetchStoredProcedures.put(storedProcedureName, storedProcedureContents);
 			        }
-					
-				} catch (SQLException e) {
+					/* Second we iterate over the list and grab the create code for the Stored Procedure */
+					for (String temp : procedureList){
+						String query =  "SHOW CREATE PROCEDURE " + dbName + "." + temp;
+						stmt = connection.createStatement();
+				        ResultSet rs = stmt.executeQuery(query); 	
+				        // Here we add the procedure name and the create code to the hashmap
+				        while (rs.next()) {
+							String procedureContents = (rs.getString("Create Procedure"));
+							fetchStoredProcedures.put(temp, procedureContents);    
+				        }
+					}
+				} catch (SQLException ex) {
+					Logger.getLogger(ScraperData .class.getName()).log(Level.SEVERE, null, ex);
 					System.out.println("method setStoredProcedures");
-					e.printStackTrace();
 				}finally {
 			        if (preparedStatement != null) { preparedStatement.close(); }
 			    }
@@ -124,21 +135,31 @@ public class ScraperData {
 		}
 
 		public void setEvents(Connection connection, String dbName) throws SQLException {
+			List<String> eventList = new ArrayList<String>();
 			HashMap<String,String> fetchEvents = new HashMap<String,String>();
 		    try {
-				preparedStatement = connection.prepareStatement(ScraperUtils.fetchEvents);
+				preparedStatement = connection.prepareStatement(ScraperUtils.fetchEventNames);
 				preparedStatement.setString(1, dbName);
 				resultSet = preparedStatement.executeQuery();
+				/* First we fetch the names of the events in the database */
 				while (resultSet.next()) {
-		            String eventName = (resultSet.getString("SPECIFIC_NAME"));
-		            String eventContents = (resultSet.getString("ROUTINE_DEFINITION"));
-		            fetchEvents.put(eventName, eventContents);
-		          
+		            String eventName = (resultSet.getString("EVENT_NAME"));
+		            eventList.add(eventName);
 		        }
-				
-			} catch (SQLException e) {
+				/* Second we iterate over the list and grab the create code for the EVENT */
+				for (String temp : eventList){
+					String query =  "SHOW CREATE EVENT " + dbName + "." + temp;
+					stmt = connection.createStatement();
+			        ResultSet rs = stmt.executeQuery(query); 	
+			        // Here we add the event name and the create code to the hashmap
+			        while (rs.next()) {
+						String functionContents = (rs.getString("Create Event"));
+				        fetchEvents.put(temp, functionContents);    
+			        }
+				}
+			} catch (SQLException ex) {
+				Logger.getLogger(ScraperData .class.getName()).log(Level.SEVERE, null, ex);
 				System.out.println("method setEvents");
-				e.printStackTrace();
 			}finally {
 		        if (preparedStatement != null) { preparedStatement.close(); }
 		    }
@@ -167,15 +188,16 @@ public class ScraperData {
 					String query =  "SHOW CREATE FUNCTION " + dbName + "." + temp;
 					stmt = connection.createStatement();
 			        ResultSet rs = stmt.executeQuery(query);    
+			        // Here we add the function name and the create code to the hashmap
 			        while (rs.next()) {
 						String functionContents = (rs.getString("Create Function"));
 				        fetchFunctions.put(temp, functionContents);    
 			        }
 				}
 				 
-			} catch (SQLException e) {
+			} catch (SQLException ex) {
+				Logger.getLogger(ScraperData .class.getName()).log(Level.SEVERE, null, ex);
 				System.out.println("method setFunctions");
-				e.printStackTrace();
 			}finally {
 		        if (preparedStatement != null) { preparedStatement.close(); }
 		    }
@@ -188,30 +210,42 @@ public class ScraperData {
 		}
 
 		public void setTriggers(Connection connection, String dbName) throws SQLException  {
+			List<String> triggerList = new ArrayList<String>();
 			HashMap<String,String> fetchTriggers = new HashMap<String,String>();
 		    try {
-				preparedStatement = connection.prepareStatement(ScraperUtils.fetchTriggers);
+				preparedStatement = connection.prepareStatement(ScraperUtils.fetchTriggerNames);
 				preparedStatement.setString(1, dbName);
 				resultSet = preparedStatement.executeQuery();
+				/* First we fetch the names of the triggers in the database */
 				while (resultSet.next()) {
 		            String triggerName = (resultSet.getString("trigger_name"));
-		            String triggerContents = (resultSet.getString("action_statement"));
-		            fetchTriggers.put(triggerName, triggerContents);    
-		        }	
-			} catch (SQLException e) {
+		            triggerList.add(triggerName);
+		        }		
+				/* Second we iterate over the list and grab the create code for the TRIGGERS */
+				for (String temp : triggerList){
+					String query =  "SHOW CREATE TRIGGER " + dbName + "." + temp;
+					stmt = connection.createStatement();
+			        ResultSet rs = stmt.executeQuery(query);    
+			        // Here we add the trigger name and the create code to the hashmap
+			        while (rs.next()) {
+						String triggerContents = (rs.getString("SQL Original Statement"));
+				        fetchTriggers.put(temp, triggerContents);    
+			        }
+				}
+			} catch (SQLException ex) {
+				Logger.getLogger(ScraperData .class.getName()).log(Level.SEVERE, null, ex);
 				System.out.println("method setTriggers");
-				e.printStackTrace();
 			}finally {
 		        if (preparedStatement != null) { preparedStatement.close(); }
 		    }
 		    System.out.println("Number of Triggers fetched: " + fetchTriggers.size());
 		    this.triggers = fetchTriggers;
-		}
+		} // END setTriggers
 
 		
 		public LinkedList<String> getTables() {
 			return tables;
-		}
+		} // END getTables()
 
 		public void setTables(Connection connection, String dbName) throws SQLException{
 			LinkedList<String>  fetchTables = new LinkedList<String>();
@@ -231,7 +265,7 @@ public class ScraperData {
 		    }
 		    System.out.println("Number of Tables fetched: " + fetchTables.size());
 			this.tables = fetchTables;
-		}
+		} // END setTables
 		
 		
 }

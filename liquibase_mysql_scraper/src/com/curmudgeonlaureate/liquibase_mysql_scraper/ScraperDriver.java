@@ -4,6 +4,8 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -96,23 +98,29 @@ public class ScraperDriver {
             } catch (ArgumentParserException e) {
                 parser.handleError(e);
             }
-         
+         // Create and test the connection
          DBConnection myConn = new DBConnection(args);
          if(myConn.getIsValidConnection() == true){
         	 System.out.println(myConn.getmysqlAccess());
          }else{
         	 System.out.println("Test Failed");
          }
+         // Write the directory structure
          ScraperUtils.createDirectoryStructure();
+         // Fetch the data
          ScraperData dbData = new ScraperData();
          try {
 			dbData.setAll(myConn.getDbConn(), myConn.getDbName());
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException ex) {
+			Logger.getLogger(ScraperDriver .class.getName()).log(Level.SEVERE, null, ex);
 		}
+         // Write the XML files used by liquibase
          ScraperWriter.writeViewsXMLFiles(dbData); 
          ScraperWriter.writeProceduresXMLFiles(dbData); 
          ScraperWriter.writeFunctionsXMLFiles(dbData); 
+         ScraperWriter.writeEventsXMLFiles(dbData); 
+         ScraperWriter.writeTriggersXMLFiles(dbData); 
+         ScraperWriter.writeTableSQLFiles(dbData,myConn);
          
          
 	 } //end method main()
