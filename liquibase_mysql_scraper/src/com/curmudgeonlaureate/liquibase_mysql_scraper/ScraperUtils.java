@@ -37,10 +37,10 @@ public class ScraperUtils {
 	public static final String fetchFunctionNames = "SELECT SPECIFIC_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'Function' AND ROUTINE_SCHEMA = ?"; 
 	public static final String fetchTables = "SELECT  TABLE_NAME  FROM information_schema.tables WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = ? AND table_name NOT LIKE '%cxm_entity_instance%' AND table_name NOT LIKE '%databasechangelog%';";
 	public static final String fetchTriggerNames = "SELECT trigger_name FROM information_schema.triggers WHERE trigger_schema = ?";
-	public static final String scraperMasterChangeLogIncludes = "\r\n<include file='stored_procedures/storedProcedures.masterChangelog.xml'/>"
-			+ "\r\n<include file='views/views.masterChangelog.xml'/> \r\n<include file='functions/functions.masterChangelog.xml'/>"
-			+ " \r\n<include file='triggers/triggers.masterChangelog.xml'/>  \r\n<include file='events/events.masterChangelog.xml'/> "
-			+ " \r\n<include file='tables/tables.masterChangelog.xml'/>";
+	public static final String scraperMasterChangeLogIncludes = "\r\n<include file='liquibase_files/stored_procedures/storedProcedures.masterChangelog.xml'/>"
+			+ "\r\n<include file='liquibase_files/views/views.masterChangelog.xml'/> \r\n<include file='liquibase_files/functions/functions.masterChangelog.xml'/>"
+			+ " \r\n<include file='liquibase_files/triggers/triggers.masterChangelog.xml'/>  \r\n<include file='liquibase_files/events/events.masterChangelog.xml'/> "
+			+ " \r\n<include file='liquibase_files/tables/tables.masterChangelog.xml'/>";
 	public static final String commentOpenTag = "<comment>";
 	public static final String commentCloseTag = "</comment>";
 	

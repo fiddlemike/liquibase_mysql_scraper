@@ -62,7 +62,10 @@ public class ScraperWriter {
 		    
 		    String fileName = key + ".xml";
 		    writeFilesToDirectory(directory, fileName, fileContents);
-		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + 
+		    		"liquibase_files/stored_procedures/"		+
+		    		fileName + 
+		    		ScraperUtils.masterChangeLogIncludeEnd;
 		    fileList.add(includeFileName);
 		}
 		/* Here we write the procedures's master changelog file*/
@@ -120,7 +123,10 @@ public class ScraperWriter {
 		    		+ ScraperUtils.changeLogFooter;
 		    String fileName = key + ".xml";
 		    writeFilesToDirectory(directory, fileName, fileContents);
-		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + 
+		    		"liquibase_files/views/" +
+		    		fileName + 
+		    		ScraperUtils.masterChangeLogIncludeEnd;
 		    fileList.add(includeFileName);
 		}
 		/* Here we write the view's master changelog file*/
@@ -159,7 +165,10 @@ public class ScraperWriter {
 		    		+ ScraperUtils.changeLogFooter;
 		    String fileName = key + ".xml";
 		    writeFilesToDirectory(directory, fileName, fileContents);
-		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + 
+		    		"liquibase_files/functions/" +
+		    		fileName + 
+		    		ScraperUtils.masterChangeLogIncludeEnd;
 		    fileList.add(includeFileName);
 		}
 		/* Here we write the view's master changelog file*/
@@ -198,7 +207,10 @@ public class ScraperWriter {
 		    		+ ScraperUtils.changeLogFooter;
 		    String fileName = key + ".xml";
 		    writeFilesToDirectory(directory, fileName, fileContents);
-		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + 
+		    		"liquibase_files/events/" +
+		    		fileName + 
+		    		ScraperUtils.masterChangeLogIncludeEnd;
 		    fileList.add(includeFileName);
 		}
 		/* Here we write the events's master changelog file*/
@@ -238,7 +250,10 @@ public class ScraperWriter {
 		    		+ ScraperUtils.changeLogFooter;
 		    String fileName = key + ".xml";
 		    writeFilesToDirectory(directory, fileName, fileContents);
-		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + 
+		    		"liquibase_files/triggers/" +
+		    		fileName + 
+		    		ScraperUtils.masterChangeLogIncludeEnd;
 		    fileList.add(includeFileName);
 		}
 		/* Here we write the trigger's master changelog file*/
@@ -277,7 +292,10 @@ public class ScraperWriter {
 		    		+ ScraperUtils.changeLogFooter;
 		    String fileName = table + ".xml";
 		    writeFilesToDirectory(directory, fileName, fileContents);
-		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + fileName + ScraperUtils.masterChangeLogIncludeEnd;
+		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + 
+		    		"liquibase_files/tables/" + 
+		    		fileName + 
+		    		ScraperUtils.masterChangeLogIncludeEnd;
 		    fileList.add(includeFileName);
 		}
 		
