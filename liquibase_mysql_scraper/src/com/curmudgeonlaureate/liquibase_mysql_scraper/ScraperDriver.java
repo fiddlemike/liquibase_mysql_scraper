@@ -13,6 +13,7 @@ import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.ArgumentType;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 /** Description of ScraperDriver
 * The purpose for this class is to be the main driver class
@@ -60,6 +61,7 @@ public class ScraperDriver {
 	public static void main(String [ ] args)
 	{
 		ArgumentParser parser = ArgumentParsers.newArgumentParser("liquibase_mysql_scraper")
+				.defaultHelp(true)
                 .description("A program to scrape an exisiting mysql database instance\n "
                 		+ "so that Liquibase source management can be used.");
         parser.addArgument("ipaddress")
@@ -93,11 +95,17 @@ public class ScraperDriver {
 		        .nargs("+")
 		        .required(true)
 		        .help("The password for the user account used to connect to the mysql database instance");
-         try {
-                System.out.println(parser.parseArgs(args));
+        		Namespace res;
+        try {
+        		res = parser.parseArgs(args);
+                System.out.println(res);
+                
             } catch (ArgumentParserException e) {
                 parser.handleError(e);
+                System.exit(1);
             }
+         
+         
          // Create and test the connection
          DBConnection myConn = new DBConnection(args);
          if(myConn.getIsValidConnection() == true){
