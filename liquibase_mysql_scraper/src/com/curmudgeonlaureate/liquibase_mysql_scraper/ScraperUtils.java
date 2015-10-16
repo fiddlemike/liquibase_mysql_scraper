@@ -81,7 +81,12 @@ public class ScraperUtils {
 			
 	 } //end method createDirectoryStructure
 
-	 
+	 public static String cleanString(String inputString){
+		 String cleanedString = inputString.replaceAll("<", "&lt;");
+		 cleanedString = inputString.replaceAll(">", "&gt;");
+		 return cleanedString;
+	 }
+
 	 
 	 /**
 	    * Escape string ready for insert via mysql client

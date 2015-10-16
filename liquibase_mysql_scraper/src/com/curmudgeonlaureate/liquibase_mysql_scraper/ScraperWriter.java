@@ -43,6 +43,7 @@ public class ScraperWriter {
 		    Map.Entry<String, String> entry = entries.next();
 		    String key = (String)entry.getKey();
 		    String value = (String)entry.getValue();
+		    String cleanedValue = ScraperUtils.cleanString(value);
 		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" 	    			
 		    		/* ChangeSet creates the stored procedure*/
 		    		+ "<changeSet "
@@ -54,7 +55,7 @@ public class ScraperWriter {
 		    		+ ScraperUtils.commentCloseTag + "\r\n"
 		    		+ "<sql dbms='mysql' endDelimiter='#' splitStatements='true'>" + "\r\n" 
 		    		+ "DROP PROCEDURE IF EXISTS " + key + ";\r\n" + "#" + "\r\n"
-		    		+ value +  "\r\n" + "#" + "\r\n"
+		    		+  cleanedValue +  "\r\n" + "#" + "\r\n"
 		    		+ "</sql>" +"\r\n" 
 		    		+"</changeSet>" 
 		    		+ ScraperUtils.changeLogFooter;
@@ -106,6 +107,7 @@ public class ScraperWriter {
 		    Map.Entry<String, String> entry = entries.next();
 		    String key = (String)entry.getKey();
 		    String value = (String)entry.getValue();
+		    String cleanedValue = ScraperUtils.cleanString(value);
 		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
 		    		+ "<changeSet author='liquibase-mysql_scraper' id='createView-"
 		    		+ key  + "'\t"  
@@ -117,7 +119,7 @@ public class ScraperWriter {
 		    		+ "replaceIfExists='true'" + "\t" 
 		    		+  "schemaName='" + dbName  + "'\t" 
 		    		+ "viewName='" + key + "'>"
-		    		+ "\r\n" + value +  "\r\n" 
+		    		+ "\r\n" + cleanedValue  +  "\r\n" 
 		    		+ "</createView>" +"\r\n" 
 		    		+"</changeSet>" 
 		    		+ ScraperUtils.changeLogFooter;
@@ -150,6 +152,7 @@ public class ScraperWriter {
 		    Map.Entry<String, String> entry = entries.next();
 		    String key = (String)entry.getKey();
 		    String value = (String)entry.getValue();
+		    String cleanedValue = ScraperUtils.cleanString(value);
 		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
 		    		+ "<changeSet author='liquibase-mysql_scraper' id='createFunction-"
 		    		+ key + "'" + "\t"  
@@ -159,7 +162,7 @@ public class ScraperWriter {
 		    		+ ScraperUtils.commentCloseTag + "\r\n"
 		    		+ "<sql dbms='mysql' endDelimiter='#' splitStatements='true'>" + "'\r\n" 
 		    		+ "DROP FUNCTION IF EXISTS " + key + ";\r\n" + "#" + "\r\n"
-		    		+ value +  "\r\n" + "#" + "\r\n"
+		    		+  cleanedValue +  "\r\n" + "#" + "\r\n"
 		    		+ "</sql>" +"\r\n" 
 		    		+"</changeSet>" 
 		    		+ ScraperUtils.changeLogFooter;
@@ -192,6 +195,7 @@ public class ScraperWriter {
 		    Map.Entry<String, String> entry = entries.next();
 		    String key = (String)entry.getKey();
 		    String value = (String)entry.getValue();
+		    String cleanedValue = ScraperUtils.cleanString(value);
 		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
 		    		+ "<changeSet author='liquibase-mysql_scraper' id='createEvent-"
 		    		+ key + "'" + "\t"  
@@ -201,7 +205,7 @@ public class ScraperWriter {
 		    		+ ScraperUtils.commentCloseTag + "\r\n"
 		    		+ "<sql dbms='mysql' endDelimiter='#' splitStatements='true'>" + "\r\n" 
 		    		+ "DROP EVENT IF EXISTS " + key + ";\r\n" + "#" + "\r\n"
-		    		+ value +  "\r\n" + "#" + "\r\n"
+		    		+ cleanedValue +  "\r\n" + "#" + "\r\n"
 		    		+ "</sql>" +"\r\n" 
 		    		+"</changeSet>" 
 		    		+ ScraperUtils.changeLogFooter;
@@ -235,6 +239,7 @@ public class ScraperWriter {
 		    Map.Entry<String, String> entry = entries.next();
 		    String key = (String)entry.getKey();
 		    String value = (String)entry.getValue();
+		    String cleanedValue = ScraperUtils.cleanString(value);
 		    String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
 		    		+ "<changeSet author='liquibase-mysql_scraper' id='createTrigger-"
 		    		+ key + "'" + "\t"  
@@ -244,7 +249,7 @@ public class ScraperWriter {
 		    		+ ScraperUtils.commentCloseTag + "\r\n"
 		    		+ "<sql dbms='mysql' endDelimiter='#' splitStatements='true'>" + "\r\n" 
 		    		+ "DROP TRIGGER IF EXISTS " + key + ";\r\n" + "#" + "\r\n"
-		    		+ value +  "\r\n" + "#" + "\r\n"
+		    		+  cleanedValue +  "\r\n" + "#" + "\r\n"
 		    		+ "</sql>" +"\r\n" 
 		    		+"</changeSet>" 
 		    		+ ScraperUtils.changeLogFooter;
@@ -401,4 +406,6 @@ public class ScraperWriter {
            System.err.println (e.getMessage());
        }
    } //END writeTable
+	
+	
 }
