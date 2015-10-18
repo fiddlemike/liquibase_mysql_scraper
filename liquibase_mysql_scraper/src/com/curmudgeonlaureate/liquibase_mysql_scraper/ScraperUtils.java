@@ -82,12 +82,9 @@ public class ScraperUtils {
 	 } //end method createDirectoryStructure
 
 	 public static String cleanString(String inputString){
-		 String cleanedString = inputString.replaceAll("<", " &lt; ");
-		 cleanedString = inputString.replaceAll("<=", " &le; "); 
-		 cleanedString =cleanedString.replaceAll(">", " &gt; ");
-		 cleanedString =cleanedString.replaceAll(">=", " &ge; ");
-		 cleanedString =cleanedString.replaceAll("<>", " != ");
-		 cleanedString =cleanedString.replaceAll("<=>", " = ");
+		 String cleanedString = inputString.replaceAll("<", " &lt; ").replaceAll("<=", " &le; ").replaceAll(">", " &gt; ").replaceAll(".*>=.*", " &ge; ");
+		 cleanedString = cleanedString.replaceAll("<>", " != ");
+		 cleanedString = cleanedString.replaceAll("<=>", " = ");
 		 cleanedString = cleanedString.replaceAll("#", "-- ");
 		 return cleanedString;
 	 }
