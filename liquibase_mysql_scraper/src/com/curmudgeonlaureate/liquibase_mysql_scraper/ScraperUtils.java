@@ -80,11 +80,14 @@ public class ScraperUtils {
         }
 			
 	 } //end method createDirectoryStructure
-
+	 
+/*
+ *  Sequencing here matters
+ * */
 	 public static String cleanString(String inputString){
-		 String cleanedString = inputString.replaceAll("<", "&#60;");
+		 String cleanedString = inputString.replaceAll("#", "-- ");	
 		 cleanedString = cleanedString.replaceAll(">", "&#62;");
-		 cleanedString = cleanedString.replaceAll("#", "-- ");			
+		 cleanedString = cleanedString .replaceAll("<", "&#60;");	
 		 return cleanedString;
 	 }
 
