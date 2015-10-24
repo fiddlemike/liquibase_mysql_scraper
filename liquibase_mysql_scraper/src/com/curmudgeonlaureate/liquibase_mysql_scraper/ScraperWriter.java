@@ -1,13 +1,8 @@
 package com.curmudgeonlaureate.liquibase_mysql_scraper;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -276,7 +271,6 @@ public class ScraperWriter {
 		Iterator<String> tableIterator = fetchedTables.iterator();
 		while (tableIterator.hasNext()) {
 			String table = tableIterator.next();
-			// writeTable(table, currentConnect);
 			
 			String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
 		    		+ "<changeSet author='liquibase-mysql_scraper' id='sqlFile-"
@@ -332,80 +326,6 @@ public class ScraperWriter {
             }
         }
 	} // END writeFilesToDirectory
-	
-	public static void writeTable(String table, DBConnection myConn){
-        try{
-           Statement tableQuery = myConn.getDbConn().createStatement 
-        		   (ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-           
-           /* Create the file to write to using the table name */
-           String fileName = table + ".sql";
-		   File file = new File("liquibase_files/tables/sql/" + fileName);
-
-			// if file doesn't exists, then create it
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-           
-			FileWriter fw = new FileWriter(file, true);
-			BufferedWriter bw = new BufferedWriter(fw);
-           
-           bw.write("\n\n--\n-- Dumping data for table `" + table + "`\n--\n\n");
-           
-           tableQuery.executeQuery ("SELECT /*!40001 SQL_NO_CACHE */ * FROM " + table);
-           ResultSet rs = tableQuery.getResultSet ();
-           ResultSetMetaData rsMetaData = rs.getMetaData();
-           int columnCount = rsMetaData.getColumnCount();
-           String prefix = new String("REPLACE INTO " + table + " (");
-           for (int i = 1; i <= columnCount; i++) {
-               if (i == columnCount){
-                   prefix += rsMetaData.getColumnName(i) + ") VALUES(";
-               }else{
-                   prefix += rsMetaData.getColumnName(i) + ",";
-               }
-           }
-           String postfix = new String();
-     
-           while (rs.next ())
-           {
-
-               postfix = "";
-               for (int i = 1; i <= columnCount; i++) {
-                   if (i == columnCount){
-                       System.err.println(rs.getMetaData().getColumnClassName(i));
-                       postfix += "'" + rs.getString(i) + "');\n";
-                   }else{
-
-                       System.err.println(rs.getMetaData().getColumnTypeName(i));
-                       if (rs.getMetaData().getColumnTypeName(i).equalsIgnoreCase("LONGBLOB")){
-                           try{
-                               postfix += "'" + ScraperUtils.escapeString(rs.getBytes(i)).toString() + "',";
-                           }catch (Exception e){
-                               postfix += "NULL,";
-                           }
-                       }else{
-                           try{
-                               postfix += "'" + rs.getString(i).replaceAll("\n","\\\\n").replaceAll("'","\\\\'") + "',";
-                           }catch (Exception e){
-                               postfix += "NULL,";
-                           }
-                   }   }
-               }
-               bw.write(prefix + postfix + "\n");
-              
-           }
-           rs.close ();
-           tableQuery.close();
-           bw.flush();
-           bw.close();
-       }catch(IOException e){
-    	   System.out.println("IOException");
-           System.err.println (e.getMessage());
-       }catch(SQLException e){
-    	   System.out.println("SQLException");
-           System.err.println (e.getMessage());
-       }
-   } //END writeTable
 	
 	
 }

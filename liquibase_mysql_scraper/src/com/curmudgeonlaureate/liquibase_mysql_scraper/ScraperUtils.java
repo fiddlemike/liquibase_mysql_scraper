@@ -92,63 +92,7 @@ public class ScraperUtils {
 	 }
 
 	 
-	 /**
-	    * Escape string ready for insert via mysql client
-	    *
-	    * @param  bytesIn       String to be escaped passed in as byte array
-	    * @return bytesOut      MySQL compatible insert ready ByteArrayOutputStream
-	    */
-	    public static ByteArrayOutputStream escapeString(byte[] bytesIn){
-	        int countBytes = bytesIn.length;
-	        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream(countBytes+ 2);
-	        for (int i = 0; i < countBytes; ++i) {
-	            byte b = bytesIn[i];
-
-	            switch (b) {
-	            case 0: /* Must be escaped for 'mysql' */
-	                    bytesOut.write('\\');
-	                    bytesOut.write('0');
-	                    break;
-
-	            case '\n': /* Must be escaped for logs */
-	                    bytesOut.write('\\');
-	                    bytesOut.write('n');
-	                    break;
-
-	            case '\r':
-	                    bytesOut.write('\\');
-	                    bytesOut.write('r');
-	                    break;
-
-	            case '\\':
-	                    bytesOut.write('\\');
-	                    bytesOut.write('\\');
-
-	                    break;
-
-	            case '\'':
-	                    bytesOut.write('\\');
-	                    bytesOut.write('\'');
-
-	                    break;
-
-	            case '"': /* Better safe than sorry */
-	                    bytesOut.write('\\');
-	                    bytesOut.write('"');
-	                    break;
-
-	            case '\032': /* This gives problems on Win32 */
-	                    bytesOut.write('\\');
-	                    bytesOut.write('Z');
-	                    break;
-
-	            default:
-	                    bytesOut.write(b);
-	            }
-	        }
-	        return bytesOut;
-	    }
-	
+	 
 	    /*
 	     * Concatenate the strings in a list into a string
 	     * 
