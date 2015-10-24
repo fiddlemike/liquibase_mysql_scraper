@@ -160,7 +160,7 @@ public class ScraperWriter {
 		    		+ ScraperUtils.commentOpenTag + "\r\n" 
 		    		+ "Adding the stored function " + key + " to base system for database "  + dbName + "\r\n"
 		    		+ ScraperUtils.commentCloseTag + "\r\n"
-		    		+ "<sql dbms='mysql' endDelimiter='#' splitStatements='true'>" + "'\r\n" 
+		    		+ "<sql dbms='mysql' endDelimiter='#' splitStatements='true'>" + "\r\n" 
 		    		+ "DROP FUNCTION IF EXISTS " + key + ";\r\n" + "#" + "\r\n"
 		    		+  cleanedValue +  "\r\n" + "#" + "\r\n"
 		    		+ "</sql>" +"\r\n" 
