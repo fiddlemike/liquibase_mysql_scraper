@@ -44,7 +44,7 @@ public class ScraperUtils {
 	public static final String commentOpenTag = "<comment>";
 	public static final String commentCloseTag = "</comment>";
 	
-	static final String[] directoriesToCreate = { "stored_procedures","views","events","triggers","functions","tables"};
+	static final String[] directoriesToCreate = { "stored_procedures","views","events","triggers","functions","tables","table_changes"};
 
 	 public static void createDirectoryStructure () {
 		 /* First write the defined directory structure */
