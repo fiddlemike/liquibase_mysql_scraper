@@ -276,7 +276,7 @@ public class ScraperWriter {
 		Iterator<String> tableIterator = fetchedTables.iterator();
 		while (tableIterator.hasNext()) {
 			String table = tableIterator.next();
-			writeTable(table, currentConnect);
+			// writeTable(table, currentConnect);
 			
 			String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
 		    		+ "<changeSet author='liquibase-mysql_scraper' id='sqlFile-"
@@ -287,7 +287,7 @@ public class ScraperWriter {
 		    		+ ScraperUtils.commentCloseTag + "\r\n"
 		    		+ "<sqlFile dbms='mysql' " + "\r\n"
 		    		+ "encoding='utf8' " + "\r\n"
-		    		+ "path='sql/" + table + ".sql' " + "\r\n"
+		    		+ "path='data/" + dbName + "_"+ table + ".sql' " + "\r\n"
 		    		+ "endDelimiter=';' " + "\r\n" 
 		    		+ "relativeToChangelogFile='true' " + "\r\n"	    				
 		    		+ "splitStatements='true' " + "\r\n"
