@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,8 +26,6 @@ public class ScraperData {
 		private HashMap<String,String> events;
 		private HashMap<String,String> functions;
 		private HashMap<String,String> triggers;
-		private LinkedList<String> tables;
-		
 		private PreparedStatement preparedStatement = null;
 		private Statement stmt = null;
 		private ResultSet resultSet = null;
@@ -42,7 +39,6 @@ public class ScraperData {
 			this.events = null;
 			this.functions = null;
 			this.triggers = null;
-			this.tables = null;
 			this.dbName = null;
 		}
 
@@ -53,7 +49,6 @@ public class ScraperData {
 			setStoredProcedures(connection, dbName);
 			setEvents(connection, dbName);
 			setFunctions(connection, dbName);
-			setTables(connection, dbName);	
 			setTriggers(connection, dbName);
 		}
 		
@@ -106,7 +101,6 @@ public class ScraperData {
 					while (resultSet.next()) {
 			            String storedProcedureName = (resultSet.getString("SPECIFIC_NAME"));
 			            procedureList.add(storedProcedureName);
-			            //fetchStoredProcedures.put(storedProcedureName, storedProcedureContents);
 			        }
 					/* Second we iterate over the list and grab the create code for the Stored Procedure */
 					for (String temp : procedureList){
@@ -239,32 +233,6 @@ public class ScraperData {
 		    }
 		    System.out.println("Number of Triggers fetched: " + fetchTriggers.size());
 		    this.triggers = fetchTriggers;
-		} // END setTriggers
-
-		
-		public LinkedList<String> getTables() {
-			return tables;
-		} // END getTables()
-
-		public void setTables(Connection connection, String dbName) throws SQLException{
-			LinkedList<String>  fetchTables = new LinkedList<String>();
-		    try {
-		    	preparedStatement = connection.prepareStatement(ScraperUtils.fetchTables);
-				preparedStatement.setString(1, dbName);
-				resultSet = preparedStatement.executeQuery();
-				while (resultSet.next()) {
-		            String tableName = (resultSet.getString("table_name"));
-		            fetchTables.add(tableName);
-		        }	
-			} catch (SQLException e) {
-				System.out.println("method setTables");
-				e.printStackTrace();
-			}finally {
-				 if (preparedStatement != null) { preparedStatement.close(); }
-		    }
-		    System.out.println("Number of Tables fetched: " + fetchTables.size());
-			this.tables = fetchTables;
-		} // END setTables
-		
+		} // END setTriggers	
 		
 }

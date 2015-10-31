@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,6 +18,7 @@ import java.util.logging.Logger;
 * 
 * @author Michael Machado
 * @version .1 August 30, 2015
+* 
 */
 public class ScraperWriter {
 	
@@ -262,26 +262,25 @@ public class ScraperWriter {
 		writeFilesToDirectory(directory, triggerChangeLog, changeLogContents);
 	} // END writeTriggersXMLFiles(ScraperData dbData)
 	
+	/*
+	 * The difference here is we are not fetching Table data, but we do set up the directory structure,
+	 * write the master changelog file and a sample changelog file. The decision here is to use the
+	 * mysqldump utility to do the table data extraction and the liquibase chnageset will use sqlFile.
+	 * */
 	public static void writeTableSQLFiles(ScraperData dbData, DBConnection currentConnect){
-		LinkedList<String>  fetchedTables = dbData.getTables();
-		List<String> fileList = new ArrayList<String>();
 		String directory = "liquibase_files/tables";
 		String tableChangeLog = "tables.masterChangelog.xml";
 		String dbName = dbData.getDbName();
-		Iterator<String> tableIterator = fetchedTables.iterator();
-		while (tableIterator.hasNext()) {
-			String table = tableIterator.next();
-			
-			String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
-		    		+ "<changeSet author='liquibase-mysql_scraper' id='sqlFile-"
-		    		+ table + "'" + "\t"  
+		
+		String fileContents = ScraperUtils.changeLogHeader + "\r\n" 
+		    		+ "<changeSet author='liquibase-mysql_scraper' id='sqlFile-sample'" + "\t"  
 		    		+ "runOnChange='true'>" + "\r\n" 
 		    		+ ScraperUtils.commentOpenTag + "\r\n" 
-		    		+ "Adding the table " + table + " data to base system for database "  + dbName + "\r\n"
+		    		+ "Adding the table DATA to base system for database "  + dbName + "\r\n"
 		    		+ ScraperUtils.commentCloseTag + "\r\n"
 		    		+ "<sqlFile dbms='mysql' " + "\r\n"
 		    		+ "encoding='utf8' " + "\r\n"
-		    		+ "path='data/" + dbName + "_"+ table + ".sql' " + "\r\n"
+		    		+ "path='data/" + dbName + "_sample.sql' " + "\r\n"
 		    		+ "endDelimiter=';' " + "\r\n" 
 		    		+ "relativeToChangelogFile='true' " + "\r\n"	    				
 		    		+ "splitStatements='true' " + "\r\n"
@@ -289,24 +288,20 @@ public class ScraperWriter {
 		    		+ "/>" + "\r\n"
 		    		+"</changeSet>" 
 		    		+ ScraperUtils.changeLogFooter;
-		    String fileName = table + ".xml";
+		   String fileName =  "SAMPLE.xml";
 		    writeFilesToDirectory(directory, fileName, fileContents);
 		    String includeFileName = ScraperUtils.masterChangeLogIncludeBegin + 
-		    		"liquibase_files/tables/" + 
-		    		fileName + 
+		    		"liquibase_files/tables/SAMPLE.xml" + 
 		    		ScraperUtils.masterChangeLogIncludeEnd;
-		    fileList.add(includeFileName);
-		}
 		
 		/* Here we write the tables's master changelog file*/
-		String changeLogIncludes = ScraperUtils.concatStringsWSep(fileList, "\r\n");
-		String changeLogContents = ScraperUtils.changeLogHeader + "\r\n" +changeLogIncludes + ScraperUtils.changeLogFooter;
+		String changeLogContents = ScraperUtils.changeLogHeader + "\r\n" + includeFileName + ScraperUtils.changeLogFooter;
 		writeFilesToDirectory(directory, tableChangeLog, changeLogContents);
-
-			
 	}// END writeTableSQLFiles
 	
-	
+	/*
+	 * Helper method used to write a file to the correct directory.
+	 * */
 	public static void writeFilesToDirectory(String directory, String fileName, String fileContents){
 
 	    FileWriter fileWriter = null;

@@ -60,9 +60,14 @@ public class ScraperDriver {
 	    
 	public static void main(String [ ] args)
 	{
+		/*
+		 * The first section of the Driver handles the command line arguments
+		 * We are using the argparse4j library.
+		 * https://github.com/tatsuhiro-t/argparse4j/releases 
+		 * */
 		ArgumentParser parser = ArgumentParsers.newArgumentParser("liquibase_mysql_scraper")
 				.defaultHelp(true)
-                .description("A program to scrape an exisiting mysql database instance\n "
+                .description("A program to scrape an existing mysql database instance\n "
                 		+ "so that Liquibase source management can be used.");
         parser.addArgument("ipaddress")
                 .metavar("IP Address")
@@ -104,7 +109,7 @@ public class ScraperDriver {
                 parser.handleError(e);
                 System.exit(1);
             }
-         
+         /* END of command line parsing */
          
          // Create and test the connection
          DBConnection myConn = new DBConnection(args);
