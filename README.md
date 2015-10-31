@@ -68,8 +68,11 @@ your liquibase version control.
           |-- data/
 </pre>
 
-Credit where due:  The application is using the argparse4j library available at  https://github.com/tatsuhiro-t/argparse4j/releases 
-to handle the command line argument processing. 
+#Credit where due:  
+The application is using the argparse4j library available at  https://github.com/tatsuhiro-t/argparse4j/releases 
+to handle the command line argument processing. (argparse4j-0.6.0.jar)
+
+You will also need the MySQL connector (mysql-connector-java-5.1.36-bin.jar)
 
 # Where it's currently at in the development process
 I just finished phase one testing against a sample database running on MySQL 5.6. It was able to complete the extraction without
