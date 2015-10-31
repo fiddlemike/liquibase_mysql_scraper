@@ -1,4 +1,9 @@
 *.class
+.classpath
+.project
+.gitignore
+
+
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -14,6 +19,10 @@ hs_err_pid*
 # liquibase changelog files and folders 
 *.masterChangelog.xml
 liquibase_files/
+.settings/
+bin/
+libs/
+
 
 # eclipse settings
 .settings/
