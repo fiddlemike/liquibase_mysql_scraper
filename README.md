@@ -85,6 +85,8 @@ Phase two testing will require a comparison of the sample database under version
 2. Add additional database systems to the list. SQL Server, PostgreSQL, etc.
 3. Have a beer.
 
+# Swing GUI for the app
+![Image of Scraper App](images/scraper_app.png)
 # Disclaimer
 Use of this application at your own risk. Author is not responsible for data loss, data corruption or 
 hair loss due to the aforementioned. This software is copyright protected.
